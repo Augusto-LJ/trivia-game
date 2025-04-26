@@ -2,11 +2,21 @@
   <div>
     <template v-if="this.question">
       <h1 v-html="this.question"></h1>
-      <template v-for="(answer, index) in this.answers" :key="index">
-        <input type="radio" name="options" value="answer">
+      <template v-for="(answer, index) in this.answers" v-bind:key="index">
+        <input
+          type="radio"
+          name="options"
+          :value="answer"
+          v-model="this.chosenAnswer"
+          :disabled="this.answerSubmitted"
+        >
         <label v-html="answer"></label><br>
       </template>
-      <button class="send" type="button">Send</button>
+      <button v-if="!this.answerSubmitted" @click="this.submitAnswer()" class="send" type="button">Send</button>
+      <section v-if="this.answerSubmitted" class="result">
+        <h4 v-if="this.chosenAnswer == this.correctAnswer">&#9989; Congratulations! The answer "{{ this.correctAnswer }}" is correct.</h4>
+        <h4 v-else>&#10060; I'm sorry, you picked the wrong answer. The correct is "{{ this.correctAnswer }}".</h4>
+      </section>
     </template>
   </div>
 
@@ -20,7 +30,9 @@ export default {
     return {
       question: undefined,
       incorrectAnswers: [],
-      correctAnswer: undefined
+      correctAnswer: undefined,
+      chosenAnswer: undefined,
+      answerSubmitted: false
     }
   },
   computed: {
@@ -28,6 +40,20 @@ export default {
       let answers = [...this.incorrectAnswers];
       answers.splice(Math.round(Math.random() * (answers.length)), 0, this.correctAnswer);
       return answers;
+    }
+  },
+  methods: {
+    submitAnswer() {
+      if (!this.chosenAnswer){
+        console.log('Pick one of the options!');
+        return;
+      }
+      this.answerSubmitted = true;
+      if (this.chosenAnswer == this.correctAnswer){
+        console.log('Correct answer!!');
+      } else {
+        console.log('Wrong answer!!');
+      }
     }
   },
   created() {
