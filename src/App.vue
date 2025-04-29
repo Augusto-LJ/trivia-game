@@ -14,8 +14,9 @@
       </template>
       <button v-if="!this.answerSubmitted" @click="this.submitAnswer()" class="send" type="button">Send</button>
       <section v-if="this.answerSubmitted" class="result">
-        <h4 v-if="this.chosenAnswer == this.correctAnswer">&#9989; Congratulations! The answer "{{ this.correctAnswer }}" is correct.</h4>
-        <h4 v-else>&#10060; I'm sorry, you picked the wrong answer. The correct is "{{ this.correctAnswer }}".</h4>
+        <h4 v-if="this.chosenAnswer == this.correctAnswer" v-html="'&#9989; Congratulations! The answer ' + this.correctAnswer + ' is correct.'"></h4>
+        <h4 v-else v-html="'&#10060; I\'m sorry, you picked the wrong answer. The correct is ' +  this.correctAnswer + '.'"></h4>
+        <button class="send" type="button" @click="this.getNewQuestion()">Next question</button>
       </section>
     </template>
   </div>
@@ -54,9 +55,13 @@ export default {
       } else {
         console.log('Wrong answer!!');
       }
-    }
-  },
-  created() {
+    },
+
+    getNewQuestion() {
+      this.answerSubmitted = false;
+      this.chosenAnswer = undefined;
+      this.question = undefined;
+
       this.axios
         .get("https://opentdb.com/api.php?amount=1&category=18")
         .then((response) => {
@@ -64,6 +69,10 @@ export default {
             this.incorrectAnswers = response.data.results[0].incorrect_answers;
             this.correctAnswer = response.data.results[0].correct_answer;
           });
+    }
+  },
+  created() {
+    this.getNewQuestion();
     }
   }
 
